@@ -4,7 +4,8 @@
 
     var _s = $.extend({
       classes: null,
-      callback: null
+      callback: null,
+      always: true
     }, opts);
 
     var _p = {
