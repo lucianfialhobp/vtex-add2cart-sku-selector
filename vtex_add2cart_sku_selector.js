@@ -47,10 +47,10 @@
           buy_button: function () {
             if ($(".buy-button").not(".fixed").length <= 0) return false;
 
-            var show_success = function(){
-                var div_success = jQuery("<div>").addClass('info-success').hide().text('Produto adicionado ao carrinho com sucesso!');
-                jQuery(".product-info-container").prepend(div_success);
-                div_success.fadeIn("slow").delay(4000).fadeOut("fast");
+            var show_error = function(msg){
+                var div_error = jQuery("<div>").addClass('info-error').hide().text(msg);
+                jQuery(".product-info-container").prepend(div_error);
+                div_error.fadeIn("slow").delay(5000).fadeOut("fast");
             }
 
             $(".buy-button").not(".fixed").addClass("fixed").click(function () {
@@ -58,8 +58,12 @@
               if (valid) {
                 var href = $(this).attr("href");
                 if (href) {
-                  show_success();
-                  _p.add2cart(href);
+                  if(/alert/.test(href)) {
+                    var msg = href.replace(/(?:.*\')(.*?)(\'.*)/,"$1");
+                    show_error(msg);
+                  } else {
+                    _p.add2cart(href);
+                  }
                 }
               }
               return false; // prevent button default action (redirect)
@@ -70,9 +74,17 @@
       add2cart: function (href) {
         if (!href) return false;
 
+        var show_success = function(){
+            var div_success = jQuery("<div>").addClass('info-success').hide().text('Produto adicionado ao carrinho com sucesso!');
+            jQuery(".product-info-container").prepend(div_success);
+            div_success.fadeIn("slow").delay(4000).fadeOut("fast");
+        };
+
         var opt = {
           url: href,
           success: function (data) {
+            // show msg after product is added
+            show_success();
             // data
             if (typeof _s.callback === "function")
               _s.callback();
@@ -102,9 +114,17 @@
                 // 1 sku
                 s = data.replace(/(?:[\S\s]*?)vtxctx\.skus(?:.*?)(\d+?)['|"].*([\S\s]*)/, "$1");
                 var url = "/no-cache/CarrinhoAdd.aspx?quantidade=1&idSku="+s;
-                _p.add2cart(url);
+                if(!_s.always) {
+                  _p.add2cart(url);
+                } else {
+                 // buy-button 
+                  $(r).vtex_popup({
+                    title: 'Adicionar ao Carrinho',
+                    classes: _s.classes
+                  });
+                  _p.set.event.buy_button();
+                }
               }
-              //_p.log("Um erro ocorreu ao tentar capturar o sku.");
             }
           }
           $.ajax(opt);
