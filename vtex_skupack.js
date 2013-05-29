@@ -1122,7 +1122,8 @@ function LoadZoom(pi) {
             zoomWidth: width,
             zoomHeight: height
         };
-        $(".image-zoom").jqzoom(optionsZoom);
+        if(typeof jQuery.fn.jqzoom !="undefined")
+            $(".image-zoom").jqzoom(optionsZoom);
     }
 }
 
