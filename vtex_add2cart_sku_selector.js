@@ -5,7 +5,9 @@
     var _s = $.extend({
       classes: null,
       callback: null,
-      always: true
+      always: true,
+      repeat: true,
+      fadeout: true
     }, opts);
 
     var _p = {
@@ -76,8 +78,16 @@
 
         var show_success = function(){
             var div_success = jQuery("<div>").addClass('info-success').hide().text('Produto adicionado ao carrinho com sucesso!');
-            jQuery(".product-info-container").prepend(div_success);
-            div_success.fadeIn("slow").delay(4000).fadeOut("fast");
+            var limit = _s.repeat ? 2 : 0; // show max of 3 or 1
+            limit = !_s.fadeout ? 0 : limit;
+
+            if(jQuery(".info-success").length<=limit) 
+              jQuery(".product-info-container").prepend(div_success);
+
+            if(_s.fadeout)
+              div_success.fadeIn("slow").delay(8000).fadeOut("fast",function(){ div_success.remove(); });
+            else
+              div_success.fadeIn("slow");
         };
 
         var opt = {
